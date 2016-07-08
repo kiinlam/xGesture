@@ -1,3 +1,3 @@
 # xGesture
-Fires tap longTap swipe events
+Fires tap longTap swipe drag events
 support mouse event

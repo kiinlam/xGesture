@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+  <title>xEvent.js</title>
+  <script src="../xEvent/xEvent.js"></script>
+  <script src="xGesture.js"></script>
+</head>
+<body>
+    <h1>xEvent.js</h1>
+    <div style="border: 1px solid #ddd;width: 200px;height: 50px;">test</div>
+    <script>
+        var el = document.querySelector('h1');
+        var div = document.querySelector('div');
+        var vh1 = XV(el);
+        vh1.drag(function (e) {
+            var w = e.dragData.x2;
+            div.style.width = w + 'px'
+        });
+
+        xGesture();
+    </script>
+</html>
