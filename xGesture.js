@@ -1,5 +1,14 @@
-; (function (window, XV) {
-    var touch = {},
+/**
+ * xGesture.js
+ * https://github.com/kiinlam/xGesture
+ */
+
+; (function (window, $) {
+    var isSupportTouch = 'ontouchend' in document ? true : false,
+        _touchstart = 'touchstart',
+        _touchmove = 'touchmove',
+        _touchend = 'touchend',
+        touch = {},
         touchTimeout, tapTimeout, swipeTimeout, longTapTimeout,
         longTapDelay = 750,
         gesture;
@@ -50,7 +59,7 @@
             gesture.target = document.body;
         }
 
-        XV(document)
+        $(document)
             .on('MSGestureEnd', function (e) {
                 var swipeDirectionFromVelocity =
                     e.velocityX > 1 ? 'Right' : e.velocityX < -1 ? 'Left' : e.velocityY > 1 ? 'Down' : e.velocityY < -1 ? 'Up' : null;
@@ -59,10 +68,10 @@
                     touch.el.trigger('swipe' + swipeDirectionFromVelocity);
                 }
             })
-            .on('touchstart MSPointerDown pointerdown', function (e) {
+            .on(_touchstart + ' MSPointerDown pointerdown', function (e) {
                 if ((_isPointerType = isPointerEventType(e, 'down')) &&
                     !isPrimaryTouch(e)) return;
-                firstTouch = _isPointerType ? e : e.touches[0];
+                firstTouch = _isPointerType || !isSupportTouch ? e : e.touches[0];
                 if (e.touches && e.touches.length === 1 && touch.x2) {
                     // Clear out touch movement data if we have it sticking around
                     // This can occur if touchcancel doesn't fire due to preventDefault, etc.
@@ -71,7 +80,7 @@
                 }
                 now = Date.now();
                 delta = now - (touch.last || now);
-                touch.el = XV('tagName' in firstTouch.target ?
+                touch.el = $('tagName' in firstTouch.target ?
                     firstTouch.target : firstTouch.target.parentNode);
                 touchTimeout && clearTimeout(touchTimeout);
                 touch.x1 = firstTouch.pageX;
@@ -82,21 +91,26 @@
                 // adds the current touch contact for IE gesture recognition
                 if (gesture && _isPointerType) gesture.addPointer(e.pointerId);
             })
-            .on('touchmove MSPointerMove pointermove', function (e) {
+            .on(_touchmove + ' MSPointerMove pointermove', function (e) {
+                var moveX = moveY = 0;
+                if (!touch.el) return;
                 if ((_isPointerType = isPointerEventType(e, 'move')) &&
                     !isPrimaryTouch(e)) return;
-                firstTouch = _isPointerType ? e : e.touches[0];
+                firstTouch = _isPointerType || !isSupportTouch ? e : e.touches[0];
                 cancelLongTap();
                 touch.x2 = firstTouch.pageX;
                 touch.y2 = firstTouch.pageY;
 
-                deltaX += Math.abs(touch.x1 - touch.x2);
-                deltaY += Math.abs(touch.y1 - touch.y2);
+                moveX = Math.abs(touch.x1 - touch.x2);
+                moveY = Math.abs(touch.y1 - touch.y2);
+                deltaX += moveX;
+                deltaY += moveY;
 
-                touch.el.trigger('drag', {dragData: touch});
-                touch.el.trigger('drag' + (direction(touch.x1, touch.x2, touch.y1, touch.y2)), {dragData: touch});
+                if (moveX > 30 || moveY > 30) {
+                    touch.el.trigger('drag', {detail: touch});
+                }
             })
-            .on('touchend MSPointerUp pointerup', function (e) {
+            .on(_touchend + ' MSPointerUp pointerup', function (e) {
                 if ((_isPointerType = isPointerEventType(e, 'up')) &&
                     !isPrimaryTouch(e)) return;
                 cancelLongTap();
@@ -122,9 +136,6 @@
 
                             // trigger universal 'tap' with the option to cancelTouch()
                             // (cancelTouch cancels processing of single vs double taps for faster 'tap' response)
-                            // var event = XV.Event('tap');
-                            // event.cancelTouch = cancelAll;
-                            // touch.el.trigger(event);
                             touch.el.trigger('tap', {'cancelTouch': cancelAll});
 
                             // trigger double tap immediately
@@ -159,10 +170,15 @@
         window.addEventListener('scroll', cancelAll, false);
     };
 
-    ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown',
-        'drag', 'dragLeft', 'dragRight', 'dragUp', 'dragDown',
+    if (!isSupportTouch) {
+        _touchstart = 'mousedown';
+        _touchmove = 'mousemove';
+        _touchend = 'mouseup';
+    }
+
+    ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown', 'drag',
         'doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function (eventName) {
-            XV.fn[eventName] = function (callback) { return this.on(eventName, callback) }
+            $.fn[eventName] = function (callback) { return this.on(eventName, callback) }
         });
     window.xGesture = gst;
 })(window, xEvent);
