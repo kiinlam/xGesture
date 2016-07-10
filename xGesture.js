@@ -93,7 +93,6 @@
             })
             .on(_touchmove + ' MSPointerMove pointermove', function (e) {
                 var moveX = moveY = 0;
-                if (!touch.el) return;
                 if ((_isPointerType = isPointerEventType(e, 'move')) &&
                     !isPrimaryTouch(e)) return;
                 firstTouch = _isPointerType || !isSupportTouch ? e : e.touches[0];
@@ -106,7 +105,7 @@
                 deltaX += moveX;
                 deltaY += moveY;
 
-                if (moveX > 30 || moveY > 30) {
+                if (touch.el && (moveX > 30 || moveY > 30)) {
                     touch.el.trigger('drag', {detail: touch});
                 }
             })
