@@ -5,9 +5,9 @@
 
 ; (function (window, $) {
     var isSupportTouch = 'ontouchend' in document ? true : false,
-        _touchstart = 'touchstart',
-        _touchmove = 'touchmove',
-        _touchend = 'touchend',
+        _touchstart = isSupportTouch ? 'touchstart' : 'mousedown',
+        _touchmove = isSupportTouch ? 'touchmove' : 'mousemove',
+        _touchend = isSupportTouch ? 'touchend' : 'mouseup',
         touch = {},
         touchTimeout, tapTimeout, swipeTimeout, longTapTimeout,
         longTapDelay = 750,
@@ -51,7 +51,7 @@
             e.type.toLowerCase() == 'mspointer' + type);
     }
 
-    var gst = function () {
+    (function () {
         var now, delta, deltaX = 0, deltaY = 0, firstTouch, _isPointerType;
 
         if ('MSGesture' in window) {
@@ -168,17 +168,10 @@
         // to scroll, not tap or swipe, so cancel all ongoing events
         // $(window).on('scroll', cancelAll);
         window.addEventListener('scroll', cancelAll, false);
-    };
-
-    if (!isSupportTouch) {
-        _touchstart = 'mousedown';
-        _touchmove = 'mousemove';
-        _touchend = 'mouseup';
-    }
+    })();
 
     ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown', 'drag',
         'doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function (eventName) {
             $.fn[eventName] = function (callback) { return this.on(eventName, callback) }
         });
-    window.xGesture = gst;
 })(window, xEvent);
