@@ -107,7 +107,7 @@
                 deltaY += moveY;
 
                 if (moveX > 30 || moveY > 30) {
-                    touch.el.trigger('drag', {detail: touch});
+                    touch.el.trigger('draw', {detail: touch});
                 }
             })
             .on(_touchend + ' MSPointerUp pointerup', function (e) {
@@ -170,7 +170,7 @@
         window.addEventListener('scroll', cancelAll, false);
     })();
 
-    ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown', 'drag',
+    ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown', 'draw',
         'doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function (eventName) {
             $.fn[eventName] = function (callback) { return this.on(eventName, callback) }
         });
