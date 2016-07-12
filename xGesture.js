@@ -9,7 +9,7 @@
         _touchmove = isSupportTouch ? 'touchmove' : 'mousemove',
         _touchend = isSupportTouch ? 'touchend' : 'mouseup',
         touch = {},
-        touchTimeout, tapTimeout, swipeTimeout, longTapTimeout,
+        touchTimeout, tapTimeout, swipeTimeout, drawEndTimeout, longTapTimeout,
         longTapDelay = 750,
         gesture;
 
@@ -35,8 +35,9 @@
         if (touchTimeout) clearTimeout(touchTimeout);
         if (tapTimeout) clearTimeout(tapTimeout);
         if (swipeTimeout) clearTimeout(swipeTimeout);
+        if (drawEndTimeout) clearTimeout(drawEndTimeout);
         if (longTapTimeout) clearTimeout(longTapTimeout);
-        touchTimeout = tapTimeout = swipeTimeout = longTapTimeout = null;
+        touchTimeout = tapTimeout = swipeTimeout = drawEndTimeout = longTapTimeout = null;
         touch = {};
     }
 
@@ -119,7 +120,9 @@
                 if ((touch.x2 && Math.abs(touch.x1 - touch.x2) > 3) ||
                     (touch.y2 && Math.abs(touch.y1 - touch.y2) > 3))
 
-                    touch.el.trigger('drawEnd');
+                    drawEndTimeout = setTimeout(function () {
+                        touch.el.trigger('drawEnd');
+                    }, 0);
 
                 // swipe
                 if ((touch.x2 && Math.abs(touch.x1 - touch.x2) > 30) ||
