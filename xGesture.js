@@ -115,6 +115,12 @@
                     !isPrimaryTouch(e)) return;
                 cancelLongTap();
 
+                // draw end
+                if ((touch.x2 && Math.abs(touch.x1 - touch.x2) > 3) ||
+                    (touch.y2 && Math.abs(touch.y1 - touch.y2) > 3))
+
+                    touch.el.trigger('drawEnd');
+
                 // swipe
                 if ((touch.x2 && Math.abs(touch.x1 - touch.x2) > 30) ||
                     (touch.y2 && Math.abs(touch.y1 - touch.y2) > 30))
