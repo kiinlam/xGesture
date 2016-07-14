@@ -10,24 +10,18 @@
 </head>
 <body>
     <h1>xGesture.js</h1>
-    <div style="border: 1px solid #ddd;width: 200px;height: 50px;">draw on h1 tag</div>
+    <div style="border: 1px solid #ddd;width: 100px;">events:</div>
     <script>
         var el = document.querySelector('h1');
         var div = document.querySelector('div');
         var vh1 = XV(el);
-        vh1.draw(function (e) {
-            var w = e.detail.x2;
-            div.style.width = w + 'px'
-        });
         ['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown',
-        'draw',
         'doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function (eventName) {
             vh1.on(eventName, function (e) {
-                console.log(e.type);
+                div.innerHTML = div.innerHTML + '<br/>' + e.type;
             });
         });
         console.log(['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown',
-        'draw',
         'doubleTap', 'tap', 'singleTap', 'longTap'].join('  '));
     </script>
 </html>

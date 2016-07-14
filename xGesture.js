@@ -9,7 +9,7 @@
         _touchmove = isSupportTouch ? 'touchmove' : 'mousemove',
         _touchend = isSupportTouch ? 'touchend' : 'mouseup',
         touch = {},
-        touchTimeout, tapTimeout, swipeTimeout, drawEndTimeout, longTapTimeout,
+        touchTimeout, tapTimeout, swipeTimeout, longTapTimeout,
         longTapDelay = 750,
         gesture;
 
@@ -35,9 +35,8 @@
         if (touchTimeout) clearTimeout(touchTimeout);
         if (tapTimeout) clearTimeout(tapTimeout);
         if (swipeTimeout) clearTimeout(swipeTimeout);
-        if (drawEndTimeout) clearTimeout(drawEndTimeout);
         if (longTapTimeout) clearTimeout(longTapTimeout);
-        touchTimeout = tapTimeout = swipeTimeout = drawEndTimeout = longTapTimeout = null;
+        touchTimeout = tapTimeout = swipeTimeout = longTapTimeout = null;
         touch = {};
     }
 
@@ -94,35 +93,25 @@
             })
             .on(_touchmove + ' MSPointerMove pointermove', function (e) {
                 var moveX = moveY = 0;
-                if (!touch.el) return;
                 if ((_isPointerType = isPointerEventType(e, 'move')) &&
                     !isPrimaryTouch(e)) return;
+                if (!touch.x1 && !touch.y1) return;
                 firstTouch = _isPointerType || !isSupportTouch ? e : e.touches[0];
-                cancelLongTap();
+
                 touch.x2 = firstTouch.pageX;
                 touch.y2 = firstTouch.pageY;
-
                 moveX = Math.abs(touch.x1 - touch.x2);
                 moveY = Math.abs(touch.y1 - touch.y2);
                 deltaX += moveX;
                 deltaY += moveY;
-
-                if (moveX > 30 || moveY > 30) {
-                    touch.el.trigger('draw', {detail: touch});
+                if (moveX > 3 || moveY > 3) {
+                    cancelLongTap();
                 }
             })
             .on(_touchend + ' MSPointerUp pointerup', function (e) {
                 if ((_isPointerType = isPointerEventType(e, 'up')) &&
                     !isPrimaryTouch(e)) return;
                 cancelLongTap();
-
-                // draw end
-                if ((touch.x2 && Math.abs(touch.x1 - touch.x2) > 3) ||
-                    (touch.y2 && Math.abs(touch.y1 - touch.y2) > 3))
-
-                    drawEndTimeout = setTimeout(function () {
-                        touch.el.trigger('drawEnd');
-                    }, 0);
 
                 // swipe
                 if ((touch.x2 && Math.abs(touch.x1 - touch.x2) > 30) ||
@@ -179,7 +168,7 @@
         window.addEventListener('scroll', cancelAll, false);
     })();
 
-    ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown', 'draw',
+    ;['swipe', 'swipeLeft', 'swipeRight', 'swipeUp', 'swipeDown',
         'doubleTap', 'tap', 'singleTap', 'longTap'].forEach(function (eventName) {
             $.fn[eventName] = function (callback) { return this.on(eventName, callback) }
         });
